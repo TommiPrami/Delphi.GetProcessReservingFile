@@ -57,7 +57,7 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <SanitizedProjectName>GetProcessReservingFile.SimpleDemo</SanitizedProjectName>
+        <SanitizedProjectName>GetProcessReservingFile_SimpleDemo</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>AQPD11;vclwinx;RVQRWrapperDAlexandria;Jedi.D11.Runtime;dacvcl280;ibdac280;FixInsight_11;fmx;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;FireDACCommonODBC;FireDACCommonDriver;appanalytics;IndyProtocols;vclx;EhLib280;IndyIPClient;dbxcds;vcledge;dac280;bindcompvclwinx;FmxTeeUI;ibdacvcl280;bindcompfmx;QR506RunD11;inetdb;FireDACSqliteDriver;DbxClientDriver;GR32_R;STDualList.D11.Runtime;Tee;soapmidas;JclVcl;vclactnband;TeeUI;fmxFireDAC;dbexpress;Jcl;DBXMySQLDriver;VclSmp;inet;vcltouch;fmxase;OpenToolsPackage;dbrtl;fmxdae;TeeDB;FireDACMSAccDriver;CustomIPTransport;Jedi.D11.Designtime;JclDeveloperTools;THComponents.D11.Runtime;vcldsnap;DBXInterBaseDriver;IndySystem;STCommon.D11.Runtime;vcldb;STLisenssit.D11.Runtime;VirtualTreesR;JclContainers;vclFireDAC;bindcomp;FireDACCommon;TextEditor.Delphi.Alexandria.Runtime;IndyCore;RESTBackendComponents;STComponents.D11.Runtime;bindcompdbx;rtl;FireDACMySQLDriver;FireDACADSDriver;RESTComponents;DBXSqliteDriver;vcl;IndyIPServer;dsnapxml;dsnapcon;adortl;vclimg;FireDACPgDriver;FireDAC;inetdbxpress;GR32_D;xmlrtl;tethering;crcontrols280;bindcompvcl;dsnap;CloudService;fmxobj;bindcompvclsmp;FMXTee;SVGIconImageList;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
@@ -98,9 +98,10 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="Unit8.pas">
-            <Form>Form8</Form>
-            <FormType>dfm</FormType>
+        <DCCReference Include="..\Source\UnitGetProcessReservingFile.Types.pas"/>
+        <DCCReference Include="..\Source\UnitGetProcessReservingFile.pas"/>
+        <DCCReference Include="FormGetProcessReservingFileSimpleDemo.pas">
+            <Form>GetProcessReservingFileSimpleDemoForm</Form>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
