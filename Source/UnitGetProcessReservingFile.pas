@@ -1,4 +1,4 @@
-﻿unit UnitGetProcessReservingFile.Types;
+﻿unit UnitGetProcessReservingFile;
 
 interface
 
@@ -8,7 +8,7 @@ function GetProcessReservingFile(const AFileName: string; out AProcessName: stri
 implementation
 
 uses
-  System.SysUtils, UnitGetProcessReservingFile.Types;
+  Winapi.Windows, System.SysUtils, UnitGetProcessReservingFile.Types;
 
 function GetProcessReservingFile(const AFileName: string; out AProcessName: string): Boolean;
 var
@@ -72,5 +72,4 @@ begin
   end;
 end;
 
-
-end;
+end.
