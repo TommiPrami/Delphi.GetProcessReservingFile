@@ -4,7 +4,6 @@ interface
 
 function GetProcessReservingFile(const AFileName: string; out AProcessName: string): Boolean;
 
-
 implementation
 
 uses
