@@ -16,6 +16,7 @@ type
     dwProcessId: DWORD;
     ProcessStartTime: FILETIME;
   end;
+  PRM_UNIQUE_PROCESS = ^RM_UNIQUE_PROCESS;
 
   RM_APP_TYPE = (
     RmUnknownApp = 0, // Unknown application type.
@@ -38,7 +39,6 @@ type
   end;
   PRM_PROCESS_INFO = ^RM_PROCESS_INFO;
 
-  PRM_UNIQUE_PROCESS = ^RM_UNIQUE_PROCESS;
   PWSTR = PWideChar;
   PCWSTR = PWideChar;
 
