@@ -3,8 +3,8 @@
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+  Winapi.Messages, Winapi.Windows, System.Classes, System.SysUtils, System.Variants, Vcl.Controls, Vcl.Dialogs,
+  Vcl.Forms, Vcl.Graphics, Vcl.StdCtrls;
 
 type
   TGetProcessReservingFileSimpleDemoForm = class(TForm)
@@ -25,7 +25,6 @@ implementation
 
 uses
   UnitGetProcessReservingFile;
-
 
 {$R *.dfm}
 
