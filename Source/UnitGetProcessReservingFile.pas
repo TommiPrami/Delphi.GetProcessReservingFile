@@ -12,7 +12,7 @@ uses
 function GetProcessReservingFile(const AFileName: string; out AProcessName: string): Boolean;
 var
   dwSession: DWORD;
-  szSessionKey: array[0..CCH_RM_SESSION_KEY] of Char;
+  szSessionKey: array[0..CCH_RM_MAX_SESSION_KEY] of Char;
   dwError: DWORD;
   pszFile: PCWSTR;
   dwReason: DWORD;

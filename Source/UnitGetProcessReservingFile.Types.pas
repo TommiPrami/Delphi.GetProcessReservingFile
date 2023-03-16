@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages;
 
 const
-  CCH_RM_SESSION_KEY = 255;
+  CCH_RM_MAX_SESSION_KEY = 255;
   CCH_RM_MAX_APP_NAME = 255;
   CCH_RM_MAX_SVC_NAME = 63;
   PROCESS_QUERY_LIMITED_INFORMATION = $1000;
