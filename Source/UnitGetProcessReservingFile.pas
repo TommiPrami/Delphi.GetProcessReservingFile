@@ -9,7 +9,7 @@ implementation
 uses
   Winapi.Windows, System.SysUtils, UnitGetProcessReservingFile.Types;
 
-function CheckProcessTime(const AProcessHandle: THandle; const AProcessStartTime: FILETIME): Boolean;
+function CheckProcessTime(const AProcessHandle: THandle; const AProcessStartTime: TFileTime): Boolean;
 var
   LCreateTime: TFileTime;
   LExitTile: TFileTime;
