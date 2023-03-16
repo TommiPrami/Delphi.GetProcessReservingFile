@@ -42,7 +42,7 @@ begin
   FillChar(LSessionKeyBuffer, SizeOf(LSessionKeyBuffer), #0);
   LApiResult := RmStartSession(LSessionHandle, 0, LSessionKeyBuffer);
 
-  if (LApiResult = ERROR_SUCCESS) then
+  if LApiResult = ERROR_SUCCESS then
   try
     LFilenamePointer := PCWSTR(AFileName);
     LApiResult := RmRegisterResources(LSessionHandle, 1, @LFilenamePointer, 0, nil, 0, nil);
