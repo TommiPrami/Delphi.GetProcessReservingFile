@@ -22,61 +22,65 @@ begin
     Result := CompareFileTime(@AProcessStartTime, @LCreateTime) = 0;
 end;
 
+function CheckProcess(const AProcessInfo: RM_PROCESS_INFO; out AProcessName: string): Boolean;
+var
+  LProcessHandle: THandle;
+  LBufferSize: Cardinal;
+  LProcessNameBuffer: array[0..MAX_PATH - 1] of Char;
+begin
+  Result := False;
+  LProcessHandle := OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, AProcessInfo.Process.dwProcessId);
+
+  if LProcessHandle <> 0 then
+  try
+    if CheckProcessTime(LProcessHandle, AProcessInfo.Process.ProcessStartTime) then
+    begin
+      LBufferSize := MAX_PATH;
+
+      if QueryFullProcessImageNameW(LProcessHandle, 0, LProcessNameBuffer, LBufferSize) and (LBufferSize <= MAX_PATH) then
+      begin
+        AProcessName := LProcessNameBuffer;
+        Exit(True);
+      end;
+    end;
+  finally
+    CloseHandle(LProcessHandle);
+  end;
+end;
+
+function CheckProcessList(const ASessionHandle: DWORD; out AProcessName: string): Boolean;
+var
+  LIndex: Integer;
+  LReason: DWORD;
+  LProcInfoNeeded: UINT;
+  LProcInfoCount: UINT;
+  LProcessInfoArray: array[0..9] of RM_PROCESS_INFO;
+begin
+  Result := False;
+  LProcInfoCount := SizeOf(LProcessInfoArray) div SizeOf(RM_PROCESS_INFO);
+
+  if RmGetList(ASessionHandle, LProcInfoNeeded, LProcInfoCount, @LProcessInfoArray[0], LReason) = ERROR_SUCCESS then
+  begin
+    for LIndex := 0 to LProcInfoCount - 1 do
+      Result := CheckProcess(LProcessInfoArray[LIndex], AProcessName);
+  end;
+end;
+
 function GetProcessReservingFile(const AFileName: string; out AProcessName: string): Boolean;
 var
   LSessionHandle: DWORD;
   LSessionKeyBuffer: array[0..CCH_RM_MAX_SESSION_KEY] of Char;
-  LApiResult: DWORD;
   LFilenamePointer: PCWSTR;
-  LReason: DWORD;
-  LIndex: Integer;
-  LProcInfoNeeded: UINT;
-  LProcInfoCount: UINT;
-  LProcessInfoArray: array[0..9] of RM_PROCESS_INFO;
-  LProcessHandle: THandle;
-  LProcessNameBuffer: array[0..MAX_PATH - 1] of Char;
-  LBufferSize: Cardinal;
 begin
   Result := False;
-
   FillChar(LSessionKeyBuffer, SizeOf(LSessionKeyBuffer), #0);
-  LApiResult := RmStartSession(LSessionHandle, 0, LSessionKeyBuffer);
 
-  if LApiResult = ERROR_SUCCESS then
+  if RmStartSession(LSessionHandle, 0, LSessionKeyBuffer) = ERROR_SUCCESS then
   try
     LFilenamePointer := PCWSTR(AFileName);
-    LApiResult := RmRegisterResources(LSessionHandle, 1, @LFilenamePointer, 0, nil, 0, nil);
 
-    if LApiResult = ERROR_SUCCESS then
-    begin
-      LProcInfoCount := SizeOf(LProcessInfoArray) div SizeOf(RM_PROCESS_INFO);
-
-      LApiResult := RmGetList(LSessionHandle, LProcInfoNeeded, LProcInfoCount, @LProcessInfoArray[0], LReason);
-
-      if LApiResult = ERROR_SUCCESS then
-      begin
-        for LIndex := 0 to LProcInfoCount - 1 do
-        begin
-          LProcessHandle := OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, LProcessInfoArray[LIndex].Process.dwProcessId);
-
-          if LProcessHandle <> 0 then
-          try
-            if CheckProcessTime(LProcessHandle, LProcessInfoArray[LIndex].Process.ProcessStartTime) then
-            begin
-              LBufferSize := MAX_PATH;
-
-              if QueryFullProcessImageNameW(LProcessHandle, 0, LProcessNameBuffer, LBufferSize) and (LBufferSize <= MAX_PATH) then
-              begin
-                AProcessName := LProcessNameBuffer;
-                Exit(True);
-              end;
-            end;
-          finally
-            CloseHandle(LProcessHandle);
-          end;
-        end;
-      end;
-    end;
+    if RmRegisterResources(LSessionHandle, 1, @LFilenamePointer, 0, nil, 0, nil) = ERROR_SUCCESS then
+      Result := CheckProcessList(LSessionHandle, AProcessName);
   finally
     RmEndSession(LSessionHandle);
   end;
