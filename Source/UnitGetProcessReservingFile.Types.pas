@@ -48,8 +48,8 @@ type
   function RmEndSession(dwSessionHandle: DWORD): DWORD; stdcall; external 'rstrtmgr.dll';
 
   function RmRegisterResources(dwSessionHandle: DWORD; nFiles: UINT;
-    rgsFilenames: PWCHAR; nApplications: UINT; rgApplications: PRM_UNIQUE_PROCESS;
-    nServices: UINT; rgServices: PWSTR): DWORD; stdcall; external 'rstrtmgr.dll';
+    rgsFilenames: PPWideChar; nApplications: UINT; rgApplications: PRM_UNIQUE_PROCESS;
+    nServices: UINT; rgServices: PPWideChar): DWORD; stdcall; external 'rstrtmgr.dll';
 
   function RmGetList(dwSessionHandle: DWORD; var pnProcInfoNeeded: UINT;
     var pnProcInfo: UINT; rgAffectedApps: PRM_PROCESS_INFO;

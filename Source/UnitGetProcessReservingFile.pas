@@ -12,11 +12,11 @@ uses
 function CheckProcessTime(const AProcessHandle: THandle; const AProcessStartTime: TFileTime): Boolean;
 var
   LCreateTime: TFileTime;
-  LExitTile: TFileTime;
+  LExitTime: TFileTime;
   LKernelTime: TFileTime;
   LUserTime: TFileTime;
 begin
-  Result := GetProcessTimes(AProcessHandle, LCreateTime, LExitTile, LKernelTime, LUserTime);
+  Result := GetProcessTimes(AProcessHandle, LCreateTime, LExitTime, LKernelTime, LUserTime);
 
   if Result then
     Result := CompareFileTime(@AProcessStartTime, @LCreateTime) = 0;
@@ -54,16 +54,30 @@ var
   LReason: DWORD;
   LProcInfoNeeded: UINT;
   LProcInfoCount: UINT;
-  LProcessInfoArray: array[0..9] of RM_PROCESS_INFO;
+  LGetListResult: DWORD;
+  LProcessInfoArray: TArray<RM_PROCESS_INFO>;
 begin
   Result := False;
-  LProcInfoCount := SizeOf(LProcessInfoArray) div SizeOf(RM_PROCESS_INFO);
+  LProcInfoNeeded := 0;
+  LProcInfoCount := 0;
+
+  // First call with a zero-sized buffer to discover how many records are needed.
+  // ERROR_MORE_DATA is the expected outcome here, not an error.
+  LGetListResult := RmGetList(ASessionHandle, LProcInfoNeeded, LProcInfoCount, nil, LReason);
+
+  if (LGetListResult <> ERROR_SUCCESS) and (LGetListResult <> ERROR_MORE_DATA) then
+    Exit;
+
+  if LProcInfoNeeded = 0 then
+    Exit;
+
+  SetLength(LProcessInfoArray, LProcInfoNeeded);
+  LProcInfoCount := LProcInfoNeeded;
 
   if RmGetList(ASessionHandle, LProcInfoNeeded, LProcInfoCount, @LProcessInfoArray[0], LReason) = ERROR_SUCCESS then
-  begin
-    for LIndex := 0 to LProcInfoCount - 1 do
-      Result := CheckProcess(LProcessInfoArray[LIndex], AProcessName);
-  end;
+    for LIndex := 0 to Integer(LProcInfoCount) - 1 do
+      if CheckProcess(LProcessInfoArray[LIndex], AProcessName) then
+        Exit(True);
 end;
 
 function GetProcessReservingFile(const AFileName: string; out AProcessName: string): Boolean;
