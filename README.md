@@ -1,6 +1,6 @@
 # Delphi.GetProcessReservingFile
 
-Method to get process that has file opened, if any.
+Returns the process that currently has a given file open, if any.
 
 Heavily influenced by: https://devblogs.microsoft.com/oldnewthing/20120217-00/?p=8283
 
@@ -8,13 +8,13 @@ Heavily influenced by: https://devblogs.microsoft.com/oldnewthing/20120217-00/?p
 
 ```Pascal
 try
-  OpenAndProcessFile(LFileName);
-excpet
+  OpenAndProcessFile(LFileName); // your code that opens the file
+except
   on E: Exception do
   begin
     ...
     if GetProcessReservingFile(LFileName, LProcessFileName) then
-      LErrorMEssage := LErrorMEssage + ' The process that is holding your file as a hostage is: "' + LProcessFileName + '"';
+      LErrorMessage := LErrorMessage + ' The process that is holding your file hostage is: "' + LProcessFileName + '"';
   end;
 end;
 ```
