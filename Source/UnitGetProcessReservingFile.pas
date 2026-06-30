@@ -2,14 +2,14 @@
 
 interface
 
-  function GetProcessReservingFile(const AFileName: string; out AProcessName: string): Boolean;
+  function GetProcessReservingFile(const AFileName: string; out AProcessImagePath: string): Boolean;
 
 implementation
 
 uses
   Winapi.Windows, System.SysUtils, UnitGetProcessReservingFile.Types;
 
-function CheckProcessTime(const AProcessHandle: THandle; const AProcessStartTime: TFileTime): Boolean;
+function ProcessStartTimeMatches(const AProcessHandle: THandle; const AProcessStartTime: TFileTime): Boolean;
 var
   LCreateTime: TFileTime;
   LExitTime: TFileTime;
@@ -22,7 +22,7 @@ begin
     Result := CompareFileTime(@AProcessStartTime, @LCreateTime) = 0;
 end;
 
-function CheckProcess(const AProcessInfo: RM_PROCESS_INFO; out AProcessName: string): Boolean;
+function TryGetProcessImageName(const AProcessInfo: RM_PROCESS_INFO; out AProcessImagePath: string): Boolean;
 var
   LProcessHandle: THandle;
   LBufferSize: Cardinal;
@@ -33,13 +33,13 @@ begin
 
   if LProcessHandle <> 0 then
   try
-    if CheckProcessTime(LProcessHandle, AProcessInfo.Process.ProcessStartTime) then
+    if ProcessStartTimeMatches(LProcessHandle, AProcessInfo.Process.ProcessStartTime) then
     begin
       LBufferSize := MAX_PATH;
 
       if QueryFullProcessImageNameW(LProcessHandle, 0, LProcessNameBuffer, LBufferSize) and (LBufferSize <= MAX_PATH) then
       begin
-        AProcessName := LProcessNameBuffer;
+        AProcessImagePath := LProcessNameBuffer;
         Exit(True);
       end;
     end;
@@ -48,7 +48,7 @@ begin
   end;
 end;
 
-function CheckProcessList(const ASessionHandle: DWORD; out AProcessName: string): Boolean;
+function TryFindReservingProcess(const ASessionHandle: DWORD; out AProcessImagePath: string): Boolean;
 var
   LIndex: Integer;
   LReason: DWORD;
@@ -76,25 +76,25 @@ begin
 
   if RmGetList(ASessionHandle, LProcInfoNeeded, LProcInfoCount, @LProcessInfoArray[0], LReason) = ERROR_SUCCESS then
     for LIndex := 0 to Integer(LProcInfoCount) - 1 do
-      if CheckProcess(LProcessInfoArray[LIndex], AProcessName) then
+      if TryGetProcessImageName(LProcessInfoArray[LIndex], AProcessImagePath) then
         Exit(True);
 end;
 
-function GetProcessReservingFile(const AFileName: string; out AProcessName: string): Boolean;
+function GetProcessReservingFile(const AFileName: string; out AProcessImagePath: string): Boolean;
 var
   LSessionHandle: DWORD;
   LSessionKeyBuffer: array[0..CCH_RM_MAX_SESSION_KEY] of Char;
-  LFilenamePointer: PCWSTR;
+  LFileNamePointer: PCWSTR;
 begin
   Result := False;
   FillChar(LSessionKeyBuffer, SizeOf(LSessionKeyBuffer), #0);
 
   if RmStartSession(LSessionHandle, 0, LSessionKeyBuffer) = ERROR_SUCCESS then
   try
-    LFilenamePointer := PCWSTR(AFileName);
+    LFileNamePointer := PCWSTR(AFileName);
 
-    if RmRegisterResources(LSessionHandle, 1, @LFilenamePointer, 0, nil, 0, nil) = ERROR_SUCCESS then
-      Result := CheckProcessList(LSessionHandle, AProcessName);
+    if RmRegisterResources(LSessionHandle, 1, @LFileNamePointer, 0, nil, 0, nil) = ERROR_SUCCESS then
+      Result := TryFindReservingProcess(LSessionHandle, AProcessImagePath);
   finally
     RmEndSession(LSessionHandle);
   end;
